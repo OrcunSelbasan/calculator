@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Calculator</string>
+    <string name="percentage">%</string>
+    <string name="clearEntry">CE</string>
+    <string name="clear">C</string>
+    <string name="divideByX">1/X</string>
+    <string name="square">x²</string>
+    <string name="squareRoot">\u221Ax</string>
+    <string name="divide">÷</string>
+    <string name="multiply">x</string>
+    <string name="subtract">-</string>
+    <string name="add">+</string>
+    <string name="changeSign">+/-</string>
+    <string name="dot">.</string>
+    <string name="equals">=</string>
+</resources>
