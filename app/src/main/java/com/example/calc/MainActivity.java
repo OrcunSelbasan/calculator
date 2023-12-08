@@ -3,6 +3,7 @@ package com.example.calc;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -22,13 +23,17 @@ public class MainActivity extends AppCompatActivity {
             nine, zero;
     private Button[] numberButtons;
     private Button[] operationButtons;
-    private Expression expression;
-    private CalculationBuilder calc = new CalculationBuilder();
+    public static String errorMessage = "";
+    private Toast toast;
+    private CalculationBuilder calc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        this.toast = Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT);
+        this.calc = new CalculationBuilder(this.toast);
 
         assignElements();
         assignOnClickListenerToNumbers();
@@ -87,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         String number = numberButtons[finalIndex].getText().toString();
-                        calc.pushInput(input, number);
+                        calc.pushInput(input, number, null);
                     }
                 });
             }
@@ -99,12 +104,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 calc.clearInput(input);
+                calc.previousOp = -1;
             }
         });
         this.clear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 calc.clearInput(input);
+                calculations.setText("");
+                calc.previousOp = -1;
             }
         });
     }
@@ -125,29 +133,8 @@ public class MainActivity extends AppCompatActivity {
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        switch (tag) {
-                            case "percentage":
-                                break;
-                            case "divideByX":
-                                break;
-                            case "square":
-                                break;
-                            case "squareRoot":
-                                break;
-                            case "divide":
-                                break;
-                            case "multiply":
-                                break;
-                            case "subtract":
-                                break;
-                            case "add":
-                                break;
-                            default:
-                                Toast.makeText(getApplicationContext(), "Unknown operation!", Toast.LENGTH_SHORT)
-                                        .show();
-                        }
+                        calc.pushInput(input, tag, calculations);
                     }
-
                 });
             }
         }
@@ -157,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
         this.dot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                calc.pushInput(input, ".");
+                calc.pushInput(input, ".", null);
             }
         });
     }
@@ -166,7 +153,16 @@ public class MainActivity extends AppCompatActivity {
         this.changeSign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String val = calc.getInput();
+                if (val == "0" || val == "") {
+                    return;
+                } else if (val.startsWith("-") && val.length() >= 2) {
+                    calc.setInput(val.substring(1));
+                } else if (!val.startsWith("-")) {
+                    String newVal = "(-" + val + ")";
+                    calc.setInput(newVal);
+                }
+                input.setText(calc.getInput());
             }
         });
     }
@@ -175,6 +171,30 @@ public class MainActivity extends AppCompatActivity {
         this.equals.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (calc.getCalc().length() > 0) {
+                    String calcString = calc.getCalc();
+                    calcString = calcString.replaceAll("x", "*")
+                            .replaceAll("÷", "/")
+                            .replaceAll("\u221A", "sqrt");
+                    calcString += calc.getInput();
+                    Expression exp = new Expression(calcString);
+                    boolean hasDouble = false;
+                    for (int i = 0; i < calcString.length(); i++) {
+                        if (calcString.charAt(i) == '.') {
+                            hasDouble = true;
+                        }
+                    }
+                    double result = exp.calculate();
+                    if (!hasDouble) {
+                        int n = (int) result;
+                        input.setText(Integer.toString(n));
+                    } else {
+                        input.setText(Double.toString(result));
+                    }
+                    calc.setInput("0");
+                    calc.setCalc("");
+                    calculations.setText("");
+                }
             }
         });
     }
