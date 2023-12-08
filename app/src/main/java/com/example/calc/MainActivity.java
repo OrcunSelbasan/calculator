@@ -22,11 +22,8 @@ public class MainActivity extends AppCompatActivity {
             nine, zero;
     private Button[] numberButtons;
     private Button[] operationButtons;
-    private Boolean isLastCalculationOperator = false,
-            hasDouble = false, isEqualed = false, hasOp = false;
-    private String stateInput = "";
-    private String calculationResult = "";
     private Expression expression;
+    private CalculationBuilder calc = new CalculationBuilder();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
         assignOnClickListenerToBackspace();
         assignOnClickListenerToOperation();
         assignOnClickListenerToEquals();
+        assignOnClickListenerToDot();
+        assignOnClickListenerToChangeSign();
     }
 
     private void assignElements() {
@@ -87,8 +86,8 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(id).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        stateInput += finalIndex;
-                        input.setText(stateInput);
+                        String number = numberButtons[finalIndex].getText().toString();
+                        calc.pushInput(input, number);
                     }
                 });
             }
@@ -99,16 +98,13 @@ public class MainActivity extends AppCompatActivity {
         this.clearEntry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                input.setText("0");
-                stateInput = "";
+                calc.clearInput(input);
             }
         });
         this.clear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                input.setText("0");
-                calculations.setText("");
-                stateInput = "";
+                calc.clearInput(input);
             }
         });
     }
@@ -117,14 +113,7 @@ public class MainActivity extends AppCompatActivity {
         backspace.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String currentState = input.getText().toString();
-                if (currentState == "" || currentState.length() == 1) {
-                    input.setText("0");
-                } else {
-                    int end = currentState.length() - 1;
-                    String newState = currentState.substring(0, end);
-                    input.setText(newState);
-                }
+                calc.popInput(input);
             }
         });
     }
@@ -136,60 +125,26 @@ public class MainActivity extends AppCompatActivity {
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String currentCalculation = calculations.getText().toString();
-                        String currentInput = input.getText().toString();
                         switch (tag) {
                             case "percentage":
-                                if (isEqualed) {
-                                    resetEqualed();
-                                    updateCalculation("%", true);
-                                } else {
-                                    updateCalculation("%", false);
-                                }
                                 break;
                             case "divideByX":
-                                // code block
                                 break;
                             case "square":
-                                // code block
                                 break;
                             case "squareRoot":
-                                // code block
                                 break;
                             case "divide":
-                                if (isEqualed) {
-                                    resetEqualed();
-                                    updateCalculation("÷", true);
-                                } else {
-                                    updateCalculation("÷", false);
-                                }
                                 break;
                             case "multiply":
-                                if (isEqualed) {
-                                    resetEqualed();
-                                    updateCalculation("x", true);
-                                } else {
-                                    updateCalculation("x", false);
-                                }
                                 break;
                             case "subtract":
-                                if (isEqualed) {
-                                    resetEqualed();
-                                    updateCalculation("-", true);
-                                } else {
-                                    updateCalculation("-", false);
-                                }
                                 break;
                             case "add":
-                                if (isEqualed) {
-                                    resetEqualed();
-                                    updateCalculation("+", true);
-                                } else {
-                                    updateCalculation("+", false);
-                                }
                                 break;
                             default:
-                                Toast.makeText(getApplicationContext(), "Unknown operation!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Unknown operation!", Toast.LENGTH_SHORT)
+                                        .show();
                         }
                     }
 
@@ -199,64 +154,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void assignOnClickListenerToDot() {
+        this.dot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calc.pushInput(input, ".");
+            }
+        });
     }
 
     private void assignOnClickListenerToChangeSign() {
+        this.changeSign.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
     private void assignOnClickListenerToEquals() {
         this.equals.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateCalculation("=", false);
-                String currentCalculation = calculations.getText().toString();
-                if (expression != null) {
-                    String finalCalculation;
-                    if (hasDouble) {
-                        double result = expression.calculate();
-                        finalCalculation = currentCalculation + " " + result;
-                        calculationResult = String.valueOf(result);
-                    } else {
-                        int result = (int) expression.calculate();
-                        finalCalculation = currentCalculation + " " + result;
-                        calculationResult = String.valueOf(result);
-                    }
-
-                    calculations.setText(finalCalculation);
-
-                    isEqualed = true;
-                }
             }
         });
-    }
-
-    private void updateCalculation(String operation, boolean reverse) {
-        String currentCalculation = calculations.getText().toString();
-        String currentInput = input.getText().toString();
-        if (operation == "=") {
-            String preparedExpression = currentCalculation.replaceAll("÷", "/").replaceAll("x", "*");
-            this.expression = new Expression(preparedExpression + " " + currentInput);
-        } else {
-
-        }
-        if (reverse == true) {
-            calculations.setText(currentCalculation + " " + operation + " " + currentInput);
-            input.setText("0");
-            stateInput = "";
-            isLastCalculationOperator = false;
-        } else {
-            calculations.setText(currentCalculation + " " + currentInput + " " + operation + " ");
-            input.setText("0");
-            stateInput = "";
-            isLastCalculationOperator = true;
-        }
-    }
-
-    private void resetEqualed() {
-        if (calculationResult != null) {
-            calculations.setText(calculationResult);
-
-            isEqualed = false;
-        }
     }
 }
