@@ -175,10 +175,19 @@ public class MainActivity extends AppCompatActivity {
                     String calcString = calc.getCalc();
                     calcString = calcString.replaceAll("x", "*")
                             .replaceAll("\u221A", "sqrt");
-                    calcString += calc.getInput();
+
+                    if (calcString.length() > 0) {
+                        if (")".equals(getCharFromLast(calcString, 1)) || "^".equals(getCharFromLast(calcString, 2))){
+
+                        } else {
+                            calcString += calc.getInput();
+                        }
+                    }
+
                     Log.i("CalcStr", calcString);
                     Expression exp = new Expression(calcString);
                     Log.i("CalcStr Res", Double.toString(exp.calculate()));
+
                     boolean hasDouble = false;
                     for (int i = 0; i < calcString.length(); i++) {
                         if (calcString.charAt(i) == '.') {
@@ -191,15 +200,22 @@ public class MainActivity extends AppCompatActivity {
                     }
                     if (!hasDouble) {
                         int n = (int) result;
-                        input.setText(Integer.toString(n));
+                        calculations.setText(Integer.toString(n));
                     } else {
-                        input.setText(Double.toString(result));
+                        calculations.setText(Double.toString(result));
                     }
                     calc.setInput("0");
                     calc.setCalc("");
-                    calculations.setText("");
+                    input.setText("0");
                 }
             }
         });
+    }
+
+    private String getCharFromLast(String str, int i) {
+        if (str.length() - i > -1) {
+            return Character.toString(str.charAt(str.length() - i));
+        }
+        return "";
     }
 }

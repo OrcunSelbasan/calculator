@@ -184,7 +184,11 @@ public class CalculationBuilder {
                 if (this.calculation == "") {
                     x = "(" + this.calculation + this.input + ")";
                 } else {
-                    x = "(" + this.calculation + ")";
+                    if (!isBasicOp(getLastChar())) {
+                        x = "(" + this.calculation + ")";
+                    } else {
+                        x = "(" + this.calculation + this.input + ")";
+                    }
                 }
                 this.calculation = "1÷" + x;
                 this.input = "0";
@@ -195,7 +199,11 @@ public class CalculationBuilder {
                 if (this.calculation == "") {
                     xsq = "(" + this.input + ")^2";
                 } else {
-                    xsq = "(" + this.calculation + ")^2";
+                    if (!isBasicOp(getLastChar())) {
+                        xsq = "(" + this.calculation + ")^2";
+                    } else {
+                        xsq = "(" + this.calculation + this.input + ")^2";
+                    }
                 }
                 this.calculation = xsq;
                 this.input = "0";
@@ -204,11 +212,15 @@ public class CalculationBuilder {
             case "squareRoot":
                 String xsqr = "";
                 if (this.calculation == "") {
-                    xsq = "\u221A(" + this.input + ")";
+                    xsqr = "\u221A(" + this.input + ")";
                 } else {
-                    xsq = "\u221A(" + this.calculation + ")";
+                    if (!isBasicOp(getLastChar())) {
+                        xsqr = "\u221A(" + this.calculation + ")";
+                    } else {
+                        xsqr = "\u221A(" + this.calculation + this.input + ")";
+                    }
                 }
-                this.calculation = xsq;
+                this.calculation = xsqr;
                 this.input = "0";
                 this.previousOp = 0;
                 return true;
@@ -259,5 +271,19 @@ public class CalculationBuilder {
             toast.show();
         }
         return type;
+    }
+
+    private boolean isBasicOp(String lastChar) {
+        if ("%÷x-+.".contains(lastChar)){
+            return true;
+        }
+        return false;
+    }
+
+    private String getLastChar() {
+        if (this.calculation.length() > 0) {
+            return Character.toString(this.calculation.charAt(this.calculation.length() - 1));
+        }
+        return "";
     }
 }
