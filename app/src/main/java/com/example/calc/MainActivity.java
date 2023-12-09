@@ -174,10 +174,11 @@ public class MainActivity extends AppCompatActivity {
                 if (calc.getCalc().length() > 0) {
                     String calcString = calc.getCalc();
                     calcString = calcString.replaceAll("x", "*")
-                            .replaceAll("÷", "/")
                             .replaceAll("\u221A", "sqrt");
                     calcString += calc.getInput();
+                    Log.i("CalcStr", calcString);
                     Expression exp = new Expression(calcString);
+                    Log.i("CalcStr Res", Double.toString(exp.calculate()));
                     boolean hasDouble = false;
                     for (int i = 0; i < calcString.length(); i++) {
                         if (calcString.charAt(i) == '.') {
@@ -185,6 +186,9 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     double result = exp.calculate();
+                    if (result % 1 > 0.0000001) {
+                        hasDouble = true;
+                    }
                     if (!hasDouble) {
                         int n = (int) result;
                         input.setText(Integer.toString(n));
