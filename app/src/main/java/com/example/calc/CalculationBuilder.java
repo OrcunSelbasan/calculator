@@ -6,23 +6,38 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
+/**
+ * The CalculationBuilder class is responsible for managing user input, handling mathematical
+ * operations, and building the calculation expression. It is used in conjunction with the
+ * main calculator application.
+ */
 public class CalculationBuilder {
     private String input;
     private Toast toast;
     private String calculation = "";
     public int previousOp = -1;
     private Boolean isDouble = false;
-
+    //Default constructor initializes the input to "0".
     public CalculationBuilder() {
         this.input = "0";
     }
+    /**
+     * Constructor that takes a Toast object for displaying messages.
+     * It also initializes the input to "0".
+     *
+     * @param toast The Toast object for displaying messages.
+     */
 
     public CalculationBuilder(Toast toast) {
         this.input = "0";
         this.toast = toast;
     }
-
+    /**
+     * Constructor that allows initializing the input with a specified value.
+     *
+     * @param input The initial input value.
+     * @throws Exception If the initial input is an empty string.
+     */
 
     public CalculationBuilder(String input) throws Exception {
         if (input == "") {
@@ -31,7 +46,12 @@ public class CalculationBuilder {
             this.input = input;
         }
     }
-
+    /**
+     * Get the current calculation expression.
+     *
+     * @return The current calculation expression as a string.
+     */
+    // Set the calculation expression to a specified value.
     public String getCalc() {
         return this.calculation;
     }
@@ -39,19 +59,21 @@ public class CalculationBuilder {
     public void setCalc(String calc) {
         this.calculation = calc;
     }
-
+    //Get the current user input.
     public String getInput() {
         return this.input;
     }
-
+    //Set the user input.
     public void setInput(String val) {
         this.input = val;
     }
-
-
+    //Handle pushing a new input value based on the user's interaction.
     public void pushInput(TextView input, String value, TextView calc) {
+        // Check if the value represents a mathematical operation
         if (handleOperation(value)) {
+            // Handle special cases for certain operations
             if (this.calculation.charAt(this.calculation.length() - 2) == '.') {
+                // Prevent invalid input after a dot in the calculation expression
                 calc.setText("");
                 input.setText("0");
                 this.input = "0";
@@ -61,6 +83,7 @@ public class CalculationBuilder {
                 return;
             }
             if (this.calculation.length() > 30) {
+                // Limit the length of the calculation expression
                 toast.setText("Max 30 characters allowed!");
                 toast.show();
                 this.input = "0";
@@ -72,7 +95,7 @@ public class CalculationBuilder {
             input.setText("0");
             return;
         }
-
+        // Limit the length of the user input
         if (this.input.length() > 15) {
             toast.setText("Max 15 characters allowed!");
             toast.show();
@@ -117,6 +140,7 @@ public class CalculationBuilder {
         input.setText(this.input);
     }
 
+     // Handle popping the last input value (backspace).
     public void popInput(TextView input) {
         int len = this.input.length();
 
@@ -134,13 +158,19 @@ public class CalculationBuilder {
         }
         input.setText(this.input);
     }
-
+    /**
+     * Clear the user input and calculation expression.
+     */
     public void clearInput(TextView input) {
         this.input = "0";
         this.calculation = "";
         input.setText("0");
     }
-
+    /**
+     * Determine the type of a value (int, double, or empty for special cases like dot).
+     * @param value The value to be evaluated.
+     * @return The type of the value as a string.
+     */
     public String getType(String value) {
         if (value == ".") {
             return "";
@@ -161,7 +191,7 @@ public class CalculationBuilder {
         }
         return "";
     }
-
+    //Save and show a specific operation in the calculation expression. Save and display.
     private void saveAndShow(String op) {
         if (previousOp == 0) {
             this.calculation = this.calculation + op + this.input;
@@ -173,6 +203,11 @@ public class CalculationBuilder {
             this.previousOp = -1;
         }
     }
+    /**
+     * Handle specific mathematical operations and update the calculation expression.
+     * @param tag The tag representing the operation to be handled.
+     * @return True if the operation is handled, false otherwise.
+     */
 
     private boolean handleOperation(String tag) {
         switch (tag) {
@@ -246,7 +281,11 @@ public class CalculationBuilder {
         }
         return false;
     }
-
+    /**
+     * Check if a given value is an integer.
+     * @param value The value to be checked.
+     * @return True if the value is an integer, false otherwise.
+     */
     private boolean isInt(String value) {
         boolean type = false;
         try {
@@ -259,7 +298,11 @@ public class CalculationBuilder {
         }
         return type;
     }
-
+    /**
+     * Check if a given value is a double.
+     * @param value The value to be checked.
+     * @return True if the value is a double, false otherwise.
+     */
     private boolean isDouble(String value) {
         boolean type = false;
         try {
@@ -272,6 +315,11 @@ public class CalculationBuilder {
         }
         return type;
     }
+    /**
+     * Check if a given character represents a basic mathematical operation.
+     * @param lastChar The character to be checked.
+     * @return True if the character represents a basic operation, false otherwise.
+     */
 
     private boolean isBasicOp(String lastChar) {
         if ("%÷x-+.".contains(lastChar)){
@@ -279,6 +327,10 @@ public class CalculationBuilder {
         }
         return false;
     }
+    /**
+     * Get the last character in the calculation expression.
+     * @return The last character as a string.
+     */
 
     private String getLastChar() {
         if (this.calculation.length() > 0) {
